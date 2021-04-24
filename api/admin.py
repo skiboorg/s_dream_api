@@ -13,6 +13,14 @@ class CategoryAdmin(admin.ModelAdmin):
     inlines = [WhyWeItemInline,FaqItemInline]
     class Meta:
         model = Category
+
+
+class OstatokAdmin(admin.ModelAdmin):
+    list_filter = ('item',)
+
+    class Meta:
+        model = Ostatok
+
 class ItemAdmin(admin.ModelAdmin):
     list_display = ['image_tag','name', 'article', 'is_active']
     # inlines = [ImagesInline]
@@ -22,8 +30,7 @@ class ItemAdmin(admin.ModelAdmin):
 
 admin.site.register(Category,CategoryAdmin)
 admin.site.register(ItemSize)
-admin.site.register(Ostatok)
-admin.site.register(Cart)
-admin.site.register(CartItem)
+admin.site.register(Ostatok,OstatokAdmin)
 # admin.site.register(ItemComplect)
 admin.site.register(Item,ItemAdmin)
+admin.site.register(Feedback)

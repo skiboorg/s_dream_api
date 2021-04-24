@@ -39,11 +39,18 @@ class FaqItemSerializer(serializers.ModelSerializer):
         model = FaqItem
         fields = '__all__'
 
+class FeedbackSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Feedback
+        fields = '__all__'
+
 
 class CategorySerializer(serializers.ModelSerializer):
     # items = ItemSerializer(many=True, read_only=True, required=False)
     why_we_items = WhyWeItemSerializer(many=True, read_only=True, required=False)
     faq_items = FaqItemSerializer(many=True, read_only=True, required=False)
+    feedbacks = FeedbackSerializer(many=True, read_only=True, required=False)
     class Meta:
         model = Category
         fields = '__all__'

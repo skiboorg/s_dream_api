@@ -74,7 +74,7 @@ class ItemSize(models.Model):
 
     class Meta:
         verbose_name = "Размер"
-        verbose_name_plural = "3. Размеры"
+        verbose_name_plural = "2. Размеры"
 
 
 
@@ -99,7 +99,7 @@ class Item(models.Model):
 
     class Meta:
         verbose_name = "Товар"
-        verbose_name_plural = "4. Товары"
+        verbose_name_plural = "3. Товары"
 
     def __str__(self):
         return f'{self.name}'
@@ -126,6 +126,19 @@ class Ostatok(models.Model):
         verbose_name = "Остаток"
         verbose_name_plural = "4. Остатки"
 
+class Feedback(models.Model):
+    category = models.ForeignKey(Category, verbose_name='Категория',
+                                 on_delete=models.SET_NULL, blank=True, null=True, db_index=True,
+                                 related_name='feedbacks')
+    image = models.ImageField('Изображение товара', upload_to='feedback/', blank=True)
+    is_active = models.BooleanField('Отображать ?', default=True, db_index=True)
+
+    def __str__(self):
+        return f'{self.id}'
+
+    class Meta:
+        verbose_name = "Отзыв"
+        verbose_name_plural = "5. Отзывы"
 
 class CartItem(models.Model):
     session = models.CharField(max_length=255,blank=True,null=True)

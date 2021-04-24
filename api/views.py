@@ -19,7 +19,7 @@ def check_if_cart_exists(session_id):
 
 
 class ItemsPagination(PageNumberPagination):
-    page_size = 2
+    page_size = 9
     page_size_query_param = 'page_size'
     max_page_size = 10000
 
@@ -32,6 +32,8 @@ class ItemsPagination(PageNumberPagination):
             'page_count':self.page.paginator.num_pages,
             'results':data
         })
+
+
 
 class GetCats(generics.ListAPIView):
     serializer_class = CategorySerializer
@@ -188,9 +190,17 @@ class SendMail(APIView):
                                         'items': items,
                                         'cart':cart
                                     })
-            cart.delete()
+            for i in cart.items.all():
+                ostatok = Ostatok.objects.get(item=i.item,size=i.size)
+                print(ostatok)
+                if ostatok.ostatok - i.quantity < 0:
+                    ostatok.ostatok = 0
+                else:
+                    ostatok.ostatok -= i.quantity
+                ostatok.save()
+            items.delete()
 
-        send_mail(type, None, settings.MAIL_TO, (settings.MAIL_TO,),
-                   fail_silently=False, html_message=html)
+        # send_mail(type, None, settings.MAIL_TO, (settings.MAIL_TO,'ToYou.work@yandex.by',),
+        #            fail_silently=False, html_message=html)
 
         return Response(status=200)
