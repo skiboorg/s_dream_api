@@ -12,7 +12,7 @@ class AmoKey(models.Model):
 class Category(models.Model):
     name = models.CharField('Название категории', max_length=255, blank=True, null=True)
     name_slug = models.CharField(max_length=255, blank=True, null=True, editable=False)
-    url = models.CharField('URL (для главной страницы - / , для остальных - /name)', max_length=255, blank=True, null=True, db_index=True)
+    url = models.CharField('URL (для главной страницы - / , для остальных - /name)', max_length=255, blank=True, null=True, db_index=True, editable=False)
 
     timerDays = models.IntegerField('Сколько дней на таймере', default=1)
 
@@ -44,8 +44,8 @@ class WhyWeItem(models.Model):
                                  on_delete=models.SET_NULL, blank=True, null=True, db_index=True,
                                  related_name='why_we_items')
 
-    title = models.CharField('Заголовок', max_length=255, blank=False, null=True)
-    text = models.CharField('Текст', max_length=255, blank=False, null=True)
+    title = models.TextField('Заголовок', max_length=255, blank=False, null=True)
+    text = models.TextField('Текст', max_length=255, blank=False, null=True)
 
     class Meta:
         verbose_name = "Преймущество"
@@ -57,8 +57,8 @@ class FaqItem(models.Model):
                                  on_delete=models.SET_NULL, blank=True, null=True, db_index=True,
                                  related_name='faq_items')
 
-    question = models.CharField('Вопрос', max_length=255, blank=False, null=True)
-    answer = RichTextUploadingField('Ответ', max_length=255, blank=False, null=True)
+    question = models.TextField('Вопрос', max_length=255, blank=False, null=True)
+    answer = RichTextUploadingField('Ответ', blank=False, null=True)
 
     class Meta:
         verbose_name = "FAQ"
