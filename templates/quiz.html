@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        .customers {
+            font-family: Arial, Helvetica, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        .customers td, .customers th {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+        .customers tr:nth-child(even){background-color: #f2f2f2;}
+
+        .customers tr:hover {background-color: #ddd;}
+
+        .customers th {
+            padding-top: 12px;
+            padding-bottom: 12px;
+            text-align: left;
+            background-color: #585858;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<table class="customers">
+
+    <tr>
+        <td style="width: 300px">Имя</td>
+        <td>{{ name }}</td>
+    </tr>
+    <tr>
+        <td style="width: 300px">Телефон</td>
+        <td>{{ phone }}</td>
+    </tr>
+
+</table>
+<h3>Ответы</h3>
+<table class="customers">
+
+    {% for q in quiz %}
+    <tr>
+        <td style="width: 300px">{{q.question}}</td>
+        <td>{{ q.answer }}</td>
+    </tr>
+    {% endfor %}
+
+
+</table>
+
+</body>
+</html>
+
+
