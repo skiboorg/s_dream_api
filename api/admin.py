@@ -9,8 +9,12 @@ class FaqItemInline (admin.TabularInline):
     model = FaqItem
     extra = 0
 
+class FeedbackInline (admin.TabularInline):
+    model = Feedback
+    extra = 0
+
 class CategoryAdmin(admin.ModelAdmin):
-    inlines = [WhyWeItemInline,FaqItemInline]
+    inlines = [WhyWeItemInline,FaqItemInline,FeedbackInline]
     class Meta:
         model = Category
 
@@ -33,4 +37,4 @@ admin.site.register(ItemSize)
 admin.site.register(Ostatok,OstatokAdmin)
 # admin.site.register(ItemComplect)
 admin.site.register(Item,ItemAdmin)
-admin.site.register(Feedback)
+

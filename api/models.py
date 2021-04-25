@@ -130,8 +130,8 @@ class Feedback(models.Model):
     category = models.ForeignKey(Category, verbose_name='Категория',
                                  on_delete=models.SET_NULL, blank=True, null=True, db_index=True,
                                  related_name='feedbacks')
-    image = models.ImageField('Изображение товара', upload_to='feedback/', blank=True)
-    is_active = models.BooleanField('Отображать ?', default=True, db_index=True)
+    image = models.ImageField('Картинка отзыва', upload_to='feedback/', blank=True)
+    is_active = models.BooleanField('Отображать отзыв?', default=True, db_index=True)
 
     def __str__(self):
         return f'{self.id}'
