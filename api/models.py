@@ -95,11 +95,15 @@ class Item(models.Model):
     is_active = models.BooleanField('Отображать товар ?', default=True, db_index=True)
     is_present = models.BooleanField('Товар в наличии ?', default=True, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
-    selected_size = models.IntegerField(default=1)
+    selected_size = models.IntegerField(default=1, editable=False)
 
     class Meta:
         verbose_name = "Товар"
         verbose_name_plural = "3. Товары"
+
+    def save(self, *args, **kwargs):
+        self.selected_size = self.size.first().id
+        super(Item, self).save(*args, **kwargs)
 
     def __str__(self):
         return f'{self.name}'

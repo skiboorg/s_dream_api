@@ -200,7 +200,7 @@ class SendMail(APIView):
                 ostatok.save()
             items.delete()
 
-        # send_mail(type, None, settings.MAIL_TO, (settings.MAIL_TO,'ToYou.work@yandex.by',),
-        #            fail_silently=False, html_message=html)
+        send_mail(type, None, settings.MAIL_TO, (settings.MAIL_TO,'ToYou.work@yandex.by',),
+                   fail_silently=False, html_message=html)
 
         return Response(status=200)
