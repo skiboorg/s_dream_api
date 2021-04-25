@@ -2,6 +2,7 @@ from django.db import models
 from ckeditor_uploader.fields import RichTextUploadingField
 from django.utils.safestring import mark_safe
 from pytils.translit import slugify
+from django.db.models.signals import post_save
 
 class AmoKey(models.Model):
     access_token = models.TextField(blank=True,null=True)
@@ -101,9 +102,7 @@ class Item(models.Model):
         verbose_name = "Товар"
         verbose_name_plural = "3. Товары"
 
-    def save(self, *args, **kwargs):
-        self.selected_size = self.size.first().id
-        super(Item, self).save(*args, **kwargs)
+
 
     def __str__(self):
         return f'{self.name}'
@@ -117,6 +116,11 @@ class Item(models.Model):
 
     image_tag.short_description = 'Изображение'
 
+
+def item_post_save(sender, instance, created, **kwargs):
+    instance.selected_size = instance.size.first().id
+
+post_save.connect(item_post_save, sender=Item)
 
 class Ostatok(models.Model):
     item = models.ForeignKey(Item, blank=True, null=True, on_delete=models.CASCADE, db_index=True, verbose_name='Товар')
