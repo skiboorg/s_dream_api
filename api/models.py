@@ -2,7 +2,6 @@ from django.db import models
 from ckeditor_uploader.fields import RichTextUploadingField
 from django.utils.safestring import mark_safe
 from pytils.translit import slugify
-from django.db.models.signals import post_save
 
 class AmoKey(models.Model):
     access_token = models.TextField(blank=True,null=True)
@@ -96,7 +95,7 @@ class Item(models.Model):
     is_active = models.BooleanField('Отображать товар ?', default=True, db_index=True)
     is_present = models.BooleanField('Товар в наличии ?', default=True, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
-    selected_size = models.IntegerField(default=1, editable=False)
+    selected_size = models.IntegerField(default=1, editable=True)
 
     class Meta:
         verbose_name = "Товар"
@@ -117,19 +116,21 @@ class Item(models.Model):
     image_tag.short_description = 'Изображение'
 
 
-def item_post_save(sender, instance, created, **kwargs):
-    print(instance.size)
-    instance.selected_size = instance.size.first().id
-
-post_save.connect(item_post_save, sender=Item)
-
 class Ostatok(models.Model):
     item = models.ForeignKey(Item, blank=True, null=True, on_delete=models.CASCADE, db_index=True, verbose_name='Товар')
     size = models.ForeignKey(ItemSize, blank=True, null=True, on_delete=models.CASCADE, db_index=True, verbose_name='Размер')
     ostatok = models.IntegerField('Остаток', default=0)
+    is_size_set = models.BooleanField(default=False, editable=True)
 
     def __str__(self):
         return f'{self.item.name}  -  {self.size.name} на остатке {self.ostatok}'
+
+    def save(self, *args, **kwargs):
+        if not self.is_size_set:
+            self.item.selected_size = self.item.size.first().id
+            self.item.save()
+            self.is_size_set = True
+        super(Ostatok, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name = "Остаток"
