@@ -18,6 +18,9 @@ class CategoryAdmin(admin.ModelAdmin):
     class Meta:
         model = Category
 
+class OstatokInline (admin.TabularInline):
+    model = Ostatok
+    extra = 0
 
 class OstatokAdmin(admin.ModelAdmin):
     list_filter = ('item',)
@@ -27,7 +30,7 @@ class OstatokAdmin(admin.ModelAdmin):
 
 class ItemAdmin(admin.ModelAdmin):
     list_display = ['image_tag','name', 'article', 'is_active']
-    # inlines = [ImagesInline]
+    inlines = [OstatokInline]
     list_filter = ('is_active','category','size',)
     class Meta:
         model = Item
