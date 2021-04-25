@@ -67,7 +67,7 @@ class FaqItem(models.Model):
 class ItemSize(models.Model):
     sostav = RichTextUploadingField('Состав комплекта', blank=True, null=True)
     name = models.CharField('Размер', max_length=255, blank=True, null=True)
-    price = models.IntegerField('Цена', blank=True, default=0, db_index=True)
+    price = models.FloatField('Цена', blank=True, default=0, db_index=True)
     is_selected = models.BooleanField(default=False, editable=False)
     def __str__(self):
         return f'{self.name}'
@@ -82,10 +82,10 @@ class ItemSize(models.Model):
 
 class Item(models.Model):
     category = models.ForeignKey(Category, verbose_name='Категория',
-                                   on_delete=models.SET_NULL, blank=True, null=True, db_index=True,
+                                   on_delete=models.SET_NULL, blank=False, null=True, db_index=True,
                                    related_name='items')
     size = models.ManyToManyField(ItemSize, verbose_name='Размеры',
-                                  blank=True,  db_index=True)
+                                  blank=False,  db_index=True)
     image = models.ImageField('Изображение товара', upload_to='items/', blank=True)
     sostav = models.CharField('Состав', max_length=255, default='хлопок 100%')
     country = models.CharField('Производство', max_length=255, default='Турция')
@@ -145,7 +145,7 @@ class CartItem(models.Model):
     item = models.ForeignKey(Item, blank=True, null=True, on_delete=models.CASCADE, db_index=True)
     size = models.ForeignKey(ItemSize, blank=True, null=True, on_delete=models.CASCADE, db_index=True)
     quantity = models.IntegerField('Кол-во', blank=True, null=True, default=1)
-    price = models.IntegerField(default=0)
+    price = models.FloatField(default=0)
 
     def __str__(self):
         return f'{self.item.name}  X {self.quantity}'
@@ -162,7 +162,7 @@ class CartItem(models.Model):
 class Cart(models.Model):
     session = models.CharField(blank=True, null=True, max_length=255)
     items = models.ManyToManyField(CartItem, blank=True, verbose_name='Товары', db_index=True)
-    total_price = models.IntegerField(default=0)
+    total_price = models.FloatField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
