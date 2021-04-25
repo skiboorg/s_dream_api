@@ -95,7 +95,7 @@ class Item(models.Model):
     is_active = models.BooleanField('Отображать товар ?', default=True, db_index=True)
     is_present = models.BooleanField('Товар в наличии ?', default=True, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
-    selected_size = models.IntegerField(default=1, editable=True)
+    selected_size = models.IntegerField(default=1, editable=False)
 
     class Meta:
         verbose_name = "Товар"
@@ -120,7 +120,7 @@ class Ostatok(models.Model):
     item = models.ForeignKey(Item, blank=True, null=True, on_delete=models.CASCADE, db_index=True, verbose_name='Товар')
     size = models.ForeignKey(ItemSize, blank=True, null=True, on_delete=models.CASCADE, db_index=True, verbose_name='Размер')
     ostatok = models.IntegerField('Остаток', default=0)
-    is_size_set = models.BooleanField(default=False, editable=True)
+    is_size_set = models.BooleanField(default=False, editable=False)
 
     def __str__(self):
         return f'{self.item.name}  -  {self.size.name} на остатке {self.ostatok}'
