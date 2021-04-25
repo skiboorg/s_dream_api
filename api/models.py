@@ -68,9 +68,23 @@ class ItemSize(models.Model):
     sostav = RichTextUploadingField('Состав комплекта', blank=True, null=True)
     name = models.CharField('Размер', max_length=255, blank=True, null=True)
     price = models.FloatField('Цена', blank=True, default=0, db_index=True)
+    old_price = models.FloatField('НЕ ТРОГАТЬ', blank=True, default=0, db_index=True , editable=True)
+    discount = models.IntegerField('Скидка', default=0)
     is_selected = models.BooleanField(default=False, editable=False)
     def __str__(self):
         return f'{self.name}'
+
+    def save(self, *args, **kwargs):
+        if self.old_price == 0:
+            self.old_price = self.price
+
+        if self.discount > 0:
+            self.old_price = self.price
+            self.price = round(self.price - (self.price * self.discount / 100),2)
+        else:
+            self.price = self.old_price
+
+        super(ItemSize, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name = "Размер"
@@ -95,7 +109,7 @@ class Item(models.Model):
     is_active = models.BooleanField('Отображать товар ?', default=True, db_index=True)
     is_present = models.BooleanField('Товар в наличии ?', default=True, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
-    selected_size = models.IntegerField(default=1, editable=True)
+    selected_size = models.IntegerField('НЕ ТРОГАТЬ',default=1, editable=True)
 
     class Meta:
         verbose_name = "Товар"
@@ -120,7 +134,7 @@ class Ostatok(models.Model):
     item = models.ForeignKey(Item, blank=True, null=True, on_delete=models.CASCADE, db_index=True, verbose_name='Товар')
     size = models.ForeignKey(ItemSize, blank=True, null=True, on_delete=models.CASCADE, db_index=True, verbose_name='Размер')
     ostatok = models.IntegerField('Остаток', default=0)
-    is_size_set = models.BooleanField(default=False, editable=True)
+    is_size_set = models.BooleanField('НЕ ТРОГАТЬ',default=False, editable=True)
 
     def __str__(self):
         return f'{self.item.name}  -  {self.size.name} на остатке {self.ostatok}'
