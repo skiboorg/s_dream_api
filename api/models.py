@@ -104,7 +104,7 @@ class Item(models.Model):
 
 
     def __str__(self):
-        return f'{self.name}'
+        return f'{self.name} ({self.article})'
 
     def image_tag(self):
 
