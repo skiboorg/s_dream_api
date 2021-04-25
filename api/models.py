@@ -118,6 +118,7 @@ class Item(models.Model):
 
 
 def item_post_save(sender, instance, created, **kwargs):
+    print(instance.size)
     instance.selected_size = instance.size.first().id
 
 post_save.connect(item_post_save, sender=Item)
