@@ -13,4 +13,5 @@ urlpatterns = [
     path('send_mail', views.SendMail.as_view()),
 
 
+
 ]

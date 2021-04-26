@@ -5,6 +5,8 @@ from pytils.translit import slugify
 
 class AmoKey(models.Model):
     access_token = models.TextField(blank=True,null=True)
+    refresh_token = models.TextField(blank=True,null=True)
+    expires_in = models.IntegerField(blank=True,null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -27,6 +29,7 @@ class Category(models.Model):
                                                                        'Alanna</span> считается премиальным '
                                                                        'и почему дает здоровый и комфортный сон')
     whyWeCenterImage = models.ImageField('Картинка блока Почему мы', upload_to='category/', blank=False, null=True)
+    showPromoBlock = models.BooleanField('Показывать промо блок?', default=False)
 
     def save(self, *args, **kwargs):
         self.name_slug = slugify(self.name)

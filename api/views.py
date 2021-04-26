@@ -6,10 +6,43 @@ from .serializers import *
 from .models import *
 from django.template.loader import render_to_string
 from django.core.mail import send_mail,EmailMessage
+from datetime import datetime
+import requests
+import datetime as dt
+from datetime import datetime
+from django.utils import timezone
+
 import settings
+
+def get_amo_key():
+    print('Checking access_token.........')
+    token = AmoKey.objects.first()
+    if (timezone.now() - token.updated_at).total_seconds() < token.expires_in:
+        print('Access_token is ok')
+        return token.access_token
+
+    else:
+        print(f'{datetime.now()} - Changing access_token')
+        headers = {
+            'Content-Type': 'application/json',
+        }
+        data = {"client_id": settings.AMO_ID, "client_secret": settings.AMO_SECRET, "grant_type": "refresh_token",
+                "refresh_token": token.refresh_token,
+                "redirect_uri": "https://sweet-dreams.by/"}
+        response = requests.post('https://toyou.amocrm.ru/oauth2/access_token', headers=headers,
+                                 json=data)
+        print(f'{datetime.now()} - AMO response')
+        print(response.json())
+        token.access_token = response.json()['access_token']
+        token.refresh_token = response.json()['refresh_token']
+        token.expires_in = response.json()['expires_in']
+        token.save()
+        print(f'{datetime.now()} - Changing access_token successful')
+        return response.json()['access_token']
 
 
 def check_if_cart_exists(session_id):
+
     cart, created = Cart.objects.get_or_create(session=session_id)
     if created:
         print('new cart created')
@@ -168,6 +201,44 @@ class MinusQuantity(APIView):
             cart_item.save()
         return Response(status=200)
 
+
+def send_amo_info(name,phone,fio):
+    token = get_amo_key()
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+
+    }
+    data = [
+        {
+        'pipeline_id' : 1371766,
+        'name': name,
+        "custom_fields_values": [
+            {
+                "field_id": 62779,
+                "values": [
+                    {
+                        "value": fio
+                    }
+                ]
+            },
+            {
+                "field_id": 62781,
+                "values": [
+                    {
+                        "value": phone
+                    }
+                ]
+            }
+        ]
+        }
+    ]
+    response = requests.post('https://toyou.amocrm.ru/api/v4/leads', headers=headers,
+                             json=data)
+    print(response.json())
+    return
+
+
 class SendMail(APIView):
     def post(self,request):
         data = request.data
@@ -181,6 +252,7 @@ class SendMail(APIView):
                                         'name':data.get('data')['name'],
                                         'phone':data.get('data')['phone'],
                                     })
+            send_amo_info('Обратный звонок', data.get('data')['phone'], data.get('data')['name'])
         if data.get('type') == 'quiz':
             type = 'Квиз'
             html = render_to_string('quiz.html',
@@ -189,6 +261,7 @@ class SendMail(APIView):
                                         'phone':data.get('data')['phone'],
                                         'quiz':data.get('data')['quiz'],
                                     })
+            send_amo_info('Квиз', data.get('data')['phone'], data.get('data')['name'])
         if data.get('type') == 'order':
             type = 'Заказ'
             cart = check_if_cart_exists(data.get('data')['session_id'])
@@ -200,7 +273,9 @@ class SendMail(APIView):
                                         'items': items,
                                         'cart':cart
                                     })
+            zakaz = ''
             for i in cart.items.all():
+                zakaz += f'{i.item.name} ({i.item.article}) x {i.quantity}шт, '
                 ostatok = Ostatok.objects.get(item=i.item,size=i.size)
                 print(ostatok)
                 if ostatok.ostatok - i.quantity < 0:
@@ -209,6 +284,8 @@ class SendMail(APIView):
                     ostatok.ostatok -= i.quantity
                 ostatok.save()
             items.delete()
+
+            send_amo_info(zakaz, data.get('data')['phone'], data.get('data')['name'])
 
         send_mail(type, None, settings.MAIL_TO, (settings.MAIL_TO,'ToYou.work@yandex.by',),
                    fail_silently=False, html_message=html)

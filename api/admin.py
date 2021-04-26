@@ -38,6 +38,6 @@ class ItemAdmin(admin.ModelAdmin):
 admin.site.register(Category,CategoryAdmin)
 admin.site.register(ItemSize)
 admin.site.register(Ostatok,OstatokAdmin)
-# admin.site.register(ItemComplect)
+admin.site.register(AmoKey)
 admin.site.register(Item,ItemAdmin)
 
