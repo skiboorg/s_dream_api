@@ -44,12 +44,14 @@
 <h3>Заказ</h3>
 <table class="customers">
     <td ><strong>Название</strong>  </td>
+    <td ><strong>Артикул</strong>  </td>
     <td ><strong>Размер</strong>  </td>
     <td ><strong>Кол-во</strong>  </td>
     <td ><strong>Цена</strong>  </td>
     {% for item in items %}
     <tr>
         <td>{{item.item.name}}</td>
+        <td>{{item.item.article}}</td>
         <td>{{ item.size.name }}</td>
         <td>{{ item.quantity }}</td>
         <td>{{ item.price }}</td>

@@ -17,6 +17,7 @@ class Category(models.Model):
     timerDays = models.IntegerField('Сколько дней на таймере', default=1)
 
     offerImage = models.ImageField('Бекграунд оффера', upload_to='category/', blank=False, null=True)
+    offerImageMobile = models.ImageField('Бекграунд оффера мобильный', upload_to='category/', blank=False, null=True)
     offerText = models.TextField('Текст оффера', default='Качественное турецкое постельное белье'
                                                          ' от официального диллера')
     offerDiscount = models.CharField('Текст скидки в оффере', max_length=255, default='со скидкой 30%')
@@ -109,13 +110,11 @@ class Item(models.Model):
     is_active = models.BooleanField('Отображать товар ?', default=True, db_index=True)
     is_present = models.BooleanField('Товар в наличии ?', default=True, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
-    selected_size = models.IntegerField('НЕ ТРОГАТЬ',default=1, editable=True)
+    selected_size = models.IntegerField('НЕ ТРОГАТЬ', default=1, editable=True)
 
     class Meta:
         verbose_name = "Товар"
         verbose_name_plural = "3. Товары"
-
-
 
     def __str__(self):
         return f'{self.name} ({self.article})'
@@ -127,6 +126,18 @@ class Item(models.Model):
         else:
             return mark_safe('<span>Изображение не загружено</span>')
 
+    def ost_tag(self):
+        text=''
+        ost = Ostatok.objects.filter(item=self)
+        for i in ost:
+            text += f'<p>{i.size.name} - <b style="color:{"red" if i.ostatok == 0 else "green"}">{i.ostatok}</b></p>'
+        print(ost)
+        if text == '':
+            text = '<b style="color:red">ОСТАТКИ НЕ УКАЗАНЫ</b>'
+        return mark_safe(text)
+
+
+    ost_tag.short_description = 'Остатки'
     image_tag.short_description = 'Изображение'
 
 
@@ -149,6 +160,7 @@ class Ostatok(models.Model):
     class Meta:
         verbose_name = "Остаток"
         verbose_name_plural = "4. Остатки"
+
 
 class Feedback(models.Model):
     category = models.ForeignKey(Category, verbose_name='Категория',
