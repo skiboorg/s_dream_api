@@ -45,6 +45,16 @@ class GetItems(APIView):
     pagination_class = ItemsPagination
     def get(self,request):
         items = Item.objects.filter(category__name_slug=self.request.query_params.get('cat_slug'),is_active=True)
+        bad_items = []
+        for i in items:
+            has_ost = False
+            ost = Ostatok.objects.filter(item=i)
+            for o in ost:
+                if o.ostatok > 0:
+                    has_ost = True
+            if not  has_ost:
+                bad_items.append(i.id)
+        items = items.exclude(id__in=bad_items)
         page = self.paginate_queryset(items)
         if page is not None:
             serializer = ItemSerializer(page, many=True, context={'request': request})
