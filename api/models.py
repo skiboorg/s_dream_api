@@ -112,6 +112,8 @@ class Item(models.Model):
     article = models.CharField('Артикул', max_length=50, blank=True, null=True)
     is_active = models.BooleanField('Отображать товар ?', default=True, db_index=True)
     is_present = models.BooleanField('Товар в наличии ?', default=True, db_index=True)
+    is_show_at_thanks_page = models.BooleanField('Показывать на странице спасибо ?', default=False, db_index=True)
+    price = models.FloatField('Цена для смтраницы спасибо', blank=True, default=0, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     selected_size = models.IntegerField('НЕ ТРОГАТЬ', default=1, editable=True)
 

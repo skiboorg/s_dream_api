@@ -239,13 +239,42 @@ def send_amo_info(name,phone,fio):
     return
 
 
-class iddqd(APIView):
+class GetItemsForThanks(APIView):
+    pagination_class = ItemsPagination
     def get(self,request):
-        items = Item.objects.filter(category_id=1)
+        items = Item.objects.filter(is_show_at_thanks_page=True)
+        bad_items = []
         for i in items:
-            i.sostav += ' (Сатин)'
-            i.save()
-        return Response(status=200)
+            has_ost = False
+            ost = Ostatok.objects.filter(item=i)
+            for o in ost:
+                if o.ostatok > 0:
+                    has_ost = True
+            if not  has_ost:
+                bad_items.append(i.id)
+        items = items.exclude(id__in=bad_items)
+        page = self.paginate_queryset(items)
+        if page is not None:
+            serializer = ItemSerializer(page, many=True, context={'request': request})
+            return self.get_paginated_response(serializer.data)
+
+    @property
+    def paginator(self):
+        if not hasattr(self, '_paginator'):
+            if self.pagination_class is None:
+                self._paginator = None
+            else:
+                self._paginator = self.pagination_class()
+        return self._paginator
+
+    def paginate_queryset(self, queryset):
+        if self.paginator is None:
+            return None
+        return self.paginator.paginate_queryset(queryset, self.request, view=self)
+
+    def get_paginated_response(self, data):
+        assert self.paginator is not None
+        return self.paginator.get_paginated_response(data)
 
 
 class SendMail(APIView):

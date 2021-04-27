@@ -3,3 +3,4 @@ django-cors-headers
 pillow
 pytils
 django-ckeditor
+amocrm_api

@@ -11,7 +11,7 @@ urlpatterns = [
     path('plus_quantity', views.PlusQuantity.as_view()),
     path('minus_quantity', views.MinusQuantity.as_view()),
     path('send_mail', views.SendMail.as_view()),
-    path('iddqd', views.iddqd.as_view()),
+    path('get_items_for_thanks', views.GetItemsForThanks.as_view()),
 
 
 
