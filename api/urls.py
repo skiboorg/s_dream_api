@@ -12,6 +12,8 @@ urlpatterns = [
     path('minus_quantity', views.MinusQuantity.as_view()),
     path('send_mail', views.SendMail.as_view()),
     path('get_items_for_thanks', views.GetItemsForThanks.as_view()),
+    path('rename', views.Rename.as_view()),
+
 
 
 

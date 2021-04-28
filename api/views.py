@@ -329,3 +329,11 @@ class SendMail(APIView):
                    fail_silently=False, html_message=html)
 
         return Response(status=200)
+class Rename(APIView):
+    def get(self, request):
+        items = Item.objects.filter(category_id=1)
+        for i in items:
+            i.sostav = 'Сатин'
+            i.save()
+        return  Response(status=200)
+
