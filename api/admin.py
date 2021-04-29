@@ -29,7 +29,7 @@ class OstatokAdmin(admin.ModelAdmin):
         model = Ostatok
 
 class ItemAdmin(admin.ModelAdmin):
-    list_display = ['image_tag','name', 'article', 'is_active','ost_tag','is_show_at_thanks_page']
+    list_display = ['image_tag','name', 'article', 'is_active','ost_tag','is_show_at_thanks_page','selected_ost_tag']
     inlines = [OstatokInline]
     list_filter = ('is_active','category','size','is_show_at_thanks_page')
     class Meta:

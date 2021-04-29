@@ -2,6 +2,7 @@ from django.db import models
 from ckeditor_uploader.fields import RichTextUploadingField
 from django.utils.safestring import mark_safe
 from pytils.translit import slugify
+from django.db.models.signals import post_save
 
 class AmoKey(models.Model):
     access_token = models.TextField(blank=True,null=True)
@@ -136,31 +137,45 @@ class Item(models.Model):
         ost = Ostatok.objects.filter(item=self)
         for i in ost:
             text += f'<p>{i.size.name} - <b style="color:{"red" if i.ostatok == 0 else "green"}">{i.ostatok}</b></p>'
-        print(ost)
         if text == '':
             text = '<b style="color:red">ОСТАТКИ НЕ УКАЗАНЫ</b>'
         return mark_safe(text)
 
+    def save(self, *args, **kwargs):
+        ostatki = Ostatok.objects.filter(item=self)
+        for ost in ostatki:
+            if ost.ostatok > 0:
+                self.selected_size = ost.size.id
+                break
+        super(Item, self).save(*args, **kwargs)
 
+    def selected_ost_tag(self):
+        if self.selected_size>0:
+            return ItemSize.objects.get(id=self.selected_size)
+        else:
+            return 'НЕ ВЫБРАН'
+
+    selected_ost_tag.short_description = 'Выбранный размер'
     ost_tag.short_description = 'Остатки'
     image_tag.short_description = 'Изображение'
+
 
 
 class Ostatok(models.Model):
     item = models.ForeignKey(Item, blank=True, null=True, on_delete=models.CASCADE, db_index=True, verbose_name='Товар')
     size = models.ForeignKey(ItemSize, blank=True, null=True, on_delete=models.CASCADE, db_index=True, verbose_name='Размер')
     ostatok = models.IntegerField('Остаток', default=0)
-    is_size_set = models.BooleanField('НЕ ТРОГАТЬ',default=False, editable=True)
+    is_size_set = models.BooleanField('НЕ ТРОГАТЬ',default=False, editable=False)
 
     def __str__(self):
         return f'{self.item.name}  -  {self.size.name} на остатке {self.ostatok}'
 
-    def save(self, *args, **kwargs):
-        if not self.is_size_set:
-            self.item.selected_size = self.item.size.first().id
-            self.item.save()
-            self.is_size_set = True
-        super(Ostatok, self).save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #     if not self.is_size_set:
+    #         self.item.selected_size = self.item.size.first().id
+    #         self.item.save()
+    #         self.is_size_set = True
+    #     super(Ostatok, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name = "Остаток"

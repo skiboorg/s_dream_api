@@ -329,6 +329,17 @@ class SendMail(APIView):
                    fail_silently=False, html_message=html)
 
         return Response(status=200)
+
+
+class UpdateOst(APIView):
+    def get(self, request):
+        items=Item.objects.all()
+
+        for i in items:
+            i.save()
+        return Response(status=200)
+
+
 class Rename(APIView):
     def get(self, request):
         items = Item.objects.filter(category_id=1)
