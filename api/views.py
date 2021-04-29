@@ -11,6 +11,7 @@ import requests
 import datetime as dt
 from datetime import datetime
 from django.utils import timezone
+from itertools import chain
 
 import settings
 
@@ -79,6 +80,8 @@ class GetItems(APIView):
     def get(self,request):
         items = Item.objects.filter(category__name_slug=self.request.query_params.get('cat_slug'),is_active=True)
         bad_items = []
+        items_has_all_ost = []
+        items_has_not_all_ost = []
         for i in items:
             has_ost = False
             ost = Ostatok.objects.filter(item=i)
@@ -88,6 +91,20 @@ class GetItems(APIView):
             if not  has_ost:
                 bad_items.append(i.id)
         items = items.exclude(id__in=bad_items)
+
+        for i in  items:
+            has_all_ost = True
+            ost = Ostatok.objects.filter(item=i)
+            for o in ost:
+                if o.ostatok == 0:
+                    has_all_ost = False
+            if has_all_ost:
+                items_has_all_ost.append(i)
+            else:
+                items_has_not_all_ost.append(i)
+        # print('items_has_all_ost',items_has_all_ost)
+        # print('items_has_not_all_ost',items_has_not_all_ost)
+        items = list(chain(items_has_all_ost, items_has_not_all_ost))
         page = self.paginate_queryset(items)
         if page is not None:
             serializer = ItemSerializer(page, many=True, context={'request': request})
