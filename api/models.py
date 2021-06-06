@@ -117,6 +117,7 @@ class Item(models.Model):
     price = models.FloatField('Цена для смтраницы спасибо', blank=True, default=0, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     selected_size = models.IntegerField('НЕ ТРОГАТЬ', default=1, editable=True)
+    ost_count = models.IntegerField(default=0, editable=True)
 
     class Meta:
         verbose_name = "Товар"

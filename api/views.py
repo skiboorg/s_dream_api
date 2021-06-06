@@ -78,7 +78,7 @@ class GetItems(APIView):
 
     pagination_class = ItemsPagination
     def get(self,request):
-        items = Item.objects.filter(category__name_slug=self.request.query_params.get('cat_slug'),is_active=True)
+        items = Item.objects.filter(category__name_slug=self.request.query_params.get('cat_slug'),is_active=True).order_by('-ost_count')
         bad_items = []
         items_has_all_ost = []
         items_has_not_all_ost = []
@@ -96,14 +96,15 @@ class GetItems(APIView):
             has_all_ost = True
             ost = Ostatok.objects.filter(item=i)
             for o in ost:
+                print(o.ostatok)
                 if o.ostatok == 0:
                     has_all_ost = False
             if has_all_ost:
                 items_has_all_ost.append(i)
             else:
                 items_has_not_all_ost.append(i)
-        # print('items_has_all_ost',items_has_all_ost)
-        # print('items_has_not_all_ost',items_has_not_all_ost)
+        print('items_has_all_ost',items_has_all_ost)
+        print('items_has_not_all_ost',items_has_not_all_ost)
         items = list(chain(items_has_all_ost, items_has_not_all_ost))
         page = self.paginate_queryset(items)
         if page is not None:
@@ -351,8 +352,13 @@ class SendMail(APIView):
 class UpdateOst(APIView):
     def get(self, request):
         items=Item.objects.all()
-
         for i in items:
+            ost = Ostatok.objects.filter(item=i)
+            ost_count = 0
+            for o in ost:
+                if o.ostatok > 0:
+                    ost_count += 1
+            i.ost_count = ost_count
             i.save()
         return Response(status=200)
 
